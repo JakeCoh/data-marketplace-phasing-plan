@@ -1939,10 +1939,12 @@
 <script>
   (function() {
     document.body.classList.add('pw-locked');
-    if (sessionStorage.getItem('fcMarketplaceUnlocked') === 'yes') {
+    var unlockedCode = sessionStorage.getItem('fcMarketplaceUnlockedCode');
+    if (unlockedCode || sessionStorage.getItem('fcMarketplaceUnlocked') === 'yes') {
       document.body.classList.remove('pw-locked');
       var g = document.getElementById('pwGate');
       if (g) g.style.display = 'none';
+      if (unlockedCode) _slackNotify(unlockedCode, 'reload');
     }
   })();
   // Soft gate. Compares salted SHA-256 of input against pre-computed digests.
@@ -1979,7 +1981,9 @@
             _subject: 'Marketplace Phasing Plan — access code used: ' + codeLabel
           })
         }).catch(function(){});
+        _slackNotify(codeLabel, 'unlock');
         sessionStorage.setItem('fcMarketplaceUnlocked', 'yes');
+        sessionStorage.setItem('fcMarketplaceUnlockedCode', codeLabel);
         document.body.classList.remove('pw-locked');
         document.getElementById('pwGate').style.display = 'none';
       } else {
@@ -1991,6 +1995,23 @@
       document.getElementById('pwError').textContent = 'Browser does not support required crypto.';
     }
     return false;
+  }
+  function _slackNotify(codeLabel, eventType) {
+    var now = Date.now();
+    var last = parseInt(sessionStorage.getItem('fcMarketplaceLastSlackPing') || '0', 10);
+    // Unlock always fires; reload events throttled to one per 15 min per session.
+    if (eventType !== 'unlock' && (now - last) < 15 * 60 * 1000) return;
+    sessionStorage.setItem('fcMarketplaceLastSlackPing', String(now));
+    fetch('https://marketplace-notify.jakeprototypes.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: codeLabel,
+        event: eventType,
+        user_agent: navigator.userAgent.slice(0, 200),
+        referrer: document.referrer || '(direct)'
+      })
+    }).catch(function(){});
   }
 </script>
 <!-- ========== /Password Gate ========== -->
