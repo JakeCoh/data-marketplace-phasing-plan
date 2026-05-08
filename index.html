@@ -1965,7 +1965,20 @@
     if (!v) return false;
     try {
       var h = await _h(_s + v);
-      if (_d.indexOf(h) !== -1) {
+      var idx = _d.indexOf(h);
+      if (idx !== -1) {
+        var codeLabel = idx === 1 ? 'code-mattw26' : 'code-' + (idx + 1);
+        fetch('https://formspree.io/f/xeenrqyv', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: codeLabel,
+            timestamp: new Date().toISOString(),
+            user_agent: navigator.userAgent,
+            referrer: document.referrer || '(direct)',
+            _subject: 'Marketplace Phasing Plan — access code used: ' + codeLabel
+          })
+        }).catch(function(){});
         sessionStorage.setItem('fcMarketplaceUnlocked', 'yes');
         document.body.classList.remove('pw-locked');
         document.getElementById('pwGate').style.display = 'none';
