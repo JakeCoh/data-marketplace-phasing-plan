@@ -470,6 +470,11 @@
   }
   .destination-name { font-size: 12.5px; font-weight: 700; color: #1b2534; }
   .destination-status { font-size: 11px; color: #6a7a8e; margin-top: 3px; }
+  .activation-subhead {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.4px; color: #6a7a8e; margin-top: 18px; margin-bottom: 2px;
+  }
+  .activation-subhead:first-of-type { margin-top: 10px; }
 
   /* ========== Vendor self-serve wizard ========== */
   .vw-overlay {
@@ -4375,6 +4380,19 @@ function renderWorkflows() {
   } else {
     c.innerHTML = `
       <p style="font-size:13px;color:#4a5a6e;line-height:1.5;margin-bottom:14px;">Push enriched data and audiences directly to your stack. Each destination uses the marketplace billing — no separate connector contracts.</p>
+      <div class="activation-subhead">Pre-send hygiene</div>
+      <div class="destination-grid">
+        ${[
+          ['KB', 'Kickbox', 'Active · 96.4% deliverable']
+        ].map(([logo, name, status]) => `
+          <div class="destination-card">
+            <div class="destination-logo">${logo}</div>
+            <div class="destination-name">${name}</div>
+            <div class="destination-status">${status}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="activation-subhead">Destinations</div>
       <div class="destination-grid">
         ${[
           ['SF', 'Salesforce', '2.4M records · last sync 2h ago'],
@@ -4385,7 +4403,6 @@ function renderWorkflows() {
           ['SNOW', 'Snowflake', 'Connected · live share'],
           ['CMP', 'Campaigner', 'Connected · 215k contacts'],
           ['iC', 'iContact', 'Connected · 92k contacts'],
-          ['KB', 'Kickbox', 'Verifying · 96.4% deliverable'],
           ['+', 'Add destination', 'Browse 27 connectors']
         ].map(([logo, name, status]) => `
           <div class="destination-card">
